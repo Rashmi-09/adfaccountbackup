@@ -1,0 +1,162 @@
+{
+	"name": "pl_Switchlinkedservices",
+	"properties": {
+		"activities": [
+			{
+				"name": "Switch1",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().TriggerName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "TriggerForLinkedService1",
+							"activities": [
+								{
+									"name": "Lookup1",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "select 'TriggerForLinkedService1'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_AzureSQLParameterized",
+											"type": "DatasetReference",
+											"parameters": {
+												"tablename": "*"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Triggerforlinkedservice2",
+							"activities": [
+								{
+									"name": "Lookup3",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "select 'Triggerforlinkedservice2'",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_AzureSQLParameterized",
+											"type": "DatasetReference",
+											"parameters": {
+												"tablename": "*"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Triggerforlinkedservice3",
+							"activities": [
+								{
+									"name": "Lookup4",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "select 'Triggerforlinkedservice3'",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_AzureSQLParameterized",
+											"type": "DatasetReference",
+											"parameters": {
+												"tablename": "*"
+											}
+										}
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Lookup2",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "select \"default\"",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_AzureSQLParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": "*"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "newTasksADF"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-07T06:33:17Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

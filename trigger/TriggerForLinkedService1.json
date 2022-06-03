@@ -1,0 +1,26 @@
+{
+	"name": "TriggerForLinkedService1",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_Switchlinkedservices",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/inputadf/blobs/",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/948be3bd-f461-4a94-b1fd-b08619a0c4a4/resourceGroups/ResourceGrpForDemo/providers/Microsoft.Storage/storageAccounts/demostoragerashmi",
+			"events": [
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
+			]
+		}
+	}
+}

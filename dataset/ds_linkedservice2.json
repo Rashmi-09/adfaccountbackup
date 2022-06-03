@@ -1,0 +1,44 @@
+{
+	"name": "ds_linkedservice2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureBlobStorage2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"C": {
+				"type": "string"
+			},
+			"D": {
+				"type": "string"
+			},
+			"F": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().F",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().D",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().C",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

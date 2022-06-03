@@ -1,0 +1,25 @@
+{
+	"name": "switchtrigger1",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_SwitchTrigger",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/switch/blobs/",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/948be3bd-f461-4a94-b1fd-b08619a0c4a4/resourceGroups/ResourceGrpForDemo/providers/Microsoft.Storage/storageAccounts/demostorage2rashmi",
+			"events": [
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
+			]
+		}
+	}
+}

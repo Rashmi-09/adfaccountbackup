@@ -1,0 +1,108 @@
+{
+	"name": "pl_scheduleDW",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetStatusofDW",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://management.azure.com/subscriptions/948be3bd-f461-4a94-b1fd-b08619a0c4a4/resourceGroups/ResourceGrpForDemo/providers/Microsoft.Synapse/workspaces/demosynapseworkspacerashmi/sqlPools/demoSQLpool?api-version=2019-06-01-preview",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com"
+					}
+				}
+			},
+			{
+				"name": "IsPoolPaused",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetStatusofDW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('GetStatusofDW').status,'Online')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "startDW",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/948be3bd-f461-4a94-b1fd-b08619a0c4a4/resourceGroups/ResourceGrpForDemo/providers/Microsoft.Synapse/workspaces/demosynapseworkspacerashmi/sqlPools/demoSQLpool/resume?api-version=2019-06-01-preview",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "stopDW",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/948be3bd-f461-4a94-b1fd-b08619a0c4a4/resourceGroups/ResourceGrpForDemo/providers/Microsoft.Synapse/workspaces/demosynapseworkspacerashmi/sqlPools/demoSQLpool/pause?api-version=2019-06-01-preview",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "newTasksADF"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-04T07:10:09Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

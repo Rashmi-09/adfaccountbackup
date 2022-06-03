@@ -1,0 +1,290 @@
+{
+	"name": "PL_Data_Validation",
+	"properties": {
+		"activities": [
+			{
+				"name": "FetchTableNames",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo'AND \nTABLE_NAME ='Merge_file_input'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_AzureSQLParameterized",
+						"type": "DatasetReference",
+						"parameters": {
+							"tablename": "."
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "FetchTableNames",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('FetchTableNames').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "SourceData",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "SourceDataToSink",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderStoredProcedureName": "[dbo].[Data_validation_source]",
+									"storedProcedureParameters": {
+										"SCHEMA_NAME": {
+											"type": "String",
+											"value": {
+												"value": "@item().TABLE_SCHEMA",
+												"type": "Expression"
+											}
+										},
+										"TABLE_NAME": {
+											"type": "String",
+											"value": {
+												"value": "@item().TABLE_NAME",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_AzureSQLParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": "."
+									}
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "SourceDataToSink",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_AzureSQLParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": {
+											"value": "@item().TABLE_NAME",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_AzureSQLParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": {
+											"value": "@concat(item().TABLE_NAME,'_','OUTPUT')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "SinkData",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "SourceData",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderStoredProcedureName": "[dbo].[Data_validation_sink]",
+									"storedProcedureParameters": {
+										"SCHEMA_NAME": {
+											"type": "String",
+											"value": {
+												"value": "@item().TABLE_SCHEMA",
+												"type": "Expression"
+											}
+										},
+										"TABLE_NAME": {
+											"type": "String",
+											"value": {
+												"value": "@concat(item().TABLE_NAME,'_','Output')",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_AzureSQLParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": "."
+									}
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "countvalidation",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "SinkData",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderStoredProcedureName": "[dbo].[COUNT_VALIDATION]",
+									"storedProcedureParameters": {
+										"SinkCount": {
+											"type": "String",
+											"value": {
+												"value": "@activity('SinkData').output.value[0].SINK_COUNT",
+												"type": "Expression"
+											}
+										},
+										"SourceCount": {
+											"type": "String",
+											"value": {
+												"value": "@activity('SourceData').output.value[0].SOURCE_COUNT",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_AzureSQLParameterized",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": "."
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"SourceCount": {
+				"type": "String"
+			},
+			"SinkCount": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Testing_Folder"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-12T12:34:16Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,9 @@
+{
+	"name": "df-newdemo",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4877a4e5-eb74-4d89-9011-14c9d78d49dc",
+		"tenantId": "cd17f599-e95b-474c-989e-3ff63c15bbc6"
+	}
+}
